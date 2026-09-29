@@ -100,6 +100,66 @@ function validasi(body) {
 }
 
 // ------------------------------------------------------------
+// ROUTE 0: GET /  -> info API dalam JSON
+// ------------------------------------------------------------
+app.get("/", (req, res) => {
+  res.json({
+    nama: "Delia Zahrani",
+    nim: "NIM_ANDA",
+    kelas: "SI5B",
+    topik: 31,
+    namaTopik: "Puskesmas - Jadwal Vaksinasi",
+    resource: "/vaccinations",
+    endpoint: [
+      "GET /",
+      "GET /vaccinations",
+      "GET /vaccinations/:id",
+      "POST /vaccinations",
+      "PUT /vaccinations/:id",
+      "DELETE /vaccinations/:id",
+      "GET /vaccinations?jenisVaksin=Hepatitis B",
+    ],
+  });
+});
+
+// ------------------------------------------------------------
+// ROUTE 1 & 6: GET /vaccinations
+// Ambil semua data, atau filter dengan query string
+// Contoh: GET /vaccinations?jenisVaksin=Hepatitis B
+// ------------------------------------------------------------
+app.get("/vaccinations", (req, res) => {
+  const { jenisVaksin } = req.query; // filter dari query string
+
+  // tanpa filter -> kembalikan semua data (array langsung)
+  if (jenisVaksin === undefined) {
+    return res.status(200).json(vaccinations);
+  }
+
+  // dengan filter -> array hasil filter (boleh kosong []), tidak membedakan huruf besar/kecil
+  const hasil = vaccinations.filter(
+    (v) => v.jenisVaksin.toLowerCase() === String(jenisVaksin).trim().toLowerCase()
+  );
+  res.status(200).json(hasil);
+});
+
+// ------------------------------------------------------------
+// ROUTE 2: GET /vaccinations/:id
+// Ambil satu data berdasarkan id
+// ------------------------------------------------------------
+app.get("/vaccinations/:id", (req, res) => {
+  const id = parseInt(req.params.id); // id dari route parameter
+  const data = vaccinations.find((v) => v.id === id);
+
+  // id tidak ada -> 404
+  if (!data) {
+    return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
+  }
+
+  // berhasil -> objek langsung (tanpa status/message)
+  res.status(200).json(data);
+});
+
+// ------------------------------------------------------------
 // JALANKAN SERVER
 // app.listen() hanya di lokal; di Vercel app di-export (serverless)
 // ------------------------------------------------------------
