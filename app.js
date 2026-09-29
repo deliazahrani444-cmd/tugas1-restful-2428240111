@@ -245,6 +245,22 @@ app.delete("/vaccinations/:id", (req, res) => {
 });
 
 // ------------------------------------------------------------
+// MIDDLEWARE CATCH-ALL 404 (harus setelah semua route)
+// ------------------------------------------------------------
+app.use((req, res) => {
+  kirim(res, 404, "error", "Endpoint tidak ditemukan", null);
+});
+
+// ------------------------------------------------------------
+// MIDDLEWARE ERROR (mis. body JSON rusak) -> tetap JSON, bukan HTML
+// ------------------------------------------------------------
+app.use((err, req, res, next) => {
+  if (err.type === "entity.parse.failed") {
+    return kirim(res, 400, "error", "Body request bukan JSON yang valid", null);
+  }
+  kirim(res, 500, "error", "Terjadi kesalahan pada server", null);
+});
+
 // ------------------------------------------------------------
 // JALANKAN SERVER
 // app.listen() hanya di lokal; di Vercel app di-export (serverless)
