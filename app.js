@@ -190,6 +190,61 @@ app.post("/vaccinations", (req, res) => {
 });
 
 // ------------------------------------------------------------
+// ROUTE 4: PUT /vaccinations/:id
+// Ganti SELURUH data (penggantian penuh), semua field wajib dikirim
+// Body: { "namaPasien": "Rudi Santoso", "nik": "1671010101010001",
+//         "jenisVaksin": "Hepatitis B", "dosisKe": 3, "tanggal": "2026-11-03" }
+// ------------------------------------------------------------
+app.put("/vaccinations/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = vaccinations.findIndex((v) => v.id === id);
+
+  // id tidak ada -> 404
+  if (index === -1) {
+    return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
+  }
+
+  // field wajib kosong / tidak valid -> 400
+  const pesanError = validasi(req.body);
+  if (pesanError) {
+    return kirim(res, 400, "error", pesanError, null);
+  }
+
+  const { namaPasien, nik, jenisVaksin, dosisKe, tanggal } = req.body;
+
+  // ganti penuh semua field (id tetap)
+  vaccinations[index] = {
+    id,
+    namaPasien: namaPasien.trim(),
+    nik: nik.trim(),
+    jenisVaksin: jenisVaksin.trim(),
+    dosisKe,
+    tanggal: tanggal.trim(),
+  };
+
+  kirim(res, 200, "success", "Data berhasil diubah", vaccinations[index]);
+});
+
+// ------------------------------------------------------------
+// ROUTE 5: DELETE /vaccinations/:id
+// Hapus data berdasarkan id
+// ------------------------------------------------------------
+app.delete("/vaccinations/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = vaccinations.findIndex((v) => v.id === id);
+
+  // id tidak ada -> 404
+  if (index === -1) {
+    return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
+  }
+
+  vaccinations.splice(index, 1);
+
+  // berhasil -> 200 + pesan, data: null
+  kirim(res, 200, "success", `Data vaksinasi dengan id ${id} berhasil dihapus`, null);
+});
+
+// ------------------------------------------------------------
 // ------------------------------------------------------------
 // JALANKAN SERVER
 // app.listen() hanya di lokal; di Vercel app di-export (serverless)
