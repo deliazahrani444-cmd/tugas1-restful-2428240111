@@ -160,6 +160,37 @@ app.get("/vaccinations/:id", (req, res) => {
 });
 
 // ------------------------------------------------------------
+// ROUTE 3: POST /vaccinations
+// Tambah data baru
+// Body: { "namaPasien": "Rudi Santoso", "nik": "1671010101010001",
+//         "jenisVaksin": "Hepatitis B", "dosisKe": 2, "tanggal": "2026-10-03" }
+// ------------------------------------------------------------
+app.post("/vaccinations", (req, res) => {
+  // validasi semua field wajib -> gagal: 400
+  const pesanError = validasi(req.body);
+  if (pesanError) {
+    return kirim(res, 400, "error", pesanError, null);
+  }
+
+  const { namaPasien, nik, jenisVaksin, dosisKe, tanggal } = req.body;
+
+  // id dibuat otomatis (nextId), tidak diambil dari body
+  const baru = {
+    id: nextId++,
+    namaPasien: namaPasien.trim(),
+    nik: nik.trim(),
+    jenisVaksin: jenisVaksin.trim(),
+    dosisKe,
+    tanggal: tanggal.trim(),
+  };
+  vaccinations.push(baru);
+
+  // berhasil -> 201 + data yang baru dibuat
+  kirim(res, 201, "success", "Data berhasil ditambahkan", baru);
+});
+
+// ------------------------------------------------------------
+// ------------------------------------------------------------
 // JALANKAN SERVER
 // app.listen() hanya di lokal; di Vercel app di-export (serverless)
 // ------------------------------------------------------------
