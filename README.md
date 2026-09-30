@@ -7,7 +7,7 @@
 | **Kelas** | SI5B |
 | **Nomor Topik** | 31 — Puskesmas: Jadwal Vaksinasi |
 | **Resource** | `/vaccinations` |
-| **Link Vercel** | https://tugas1-restful-2428240111.vercel.app |
+| **Link Vercel** | https://tugas1-restful-2428240111-delia-etheajbr4-delia9.vercel.app |
 | **Link GitHub** | https://github.com/deliazahrani444-cmd/tugas1-restful-2428240111 |
 
 ## Cara Menjalankan Lokal
