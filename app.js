@@ -1,22 +1,8 @@
-// ============================================================
-// Tugas 1 - RESTful API Murni dengan Express.js (SI5B)
-// Nama   : Delia Zahrani
-// NIM    : NIM_ANDA   <-- ganti dengan NIM asli
-// Topik  : 31 - Puskesmas: Jadwal Vaksinasi
-// Resource: /vaccinations
-// ============================================================
-
-// impor express
 const express = require("express");
 const app = express();
 
-// middleware agar body JSON (Content-Type: application/json) terbaca di req.body
 app.use(express.json());
 
-// ------------------------------------------------------------
-// DATA AWAL (disimpan di array memori, tanpa database)
-// Field wajib (*): namaPasien, nik, jenisVaksin, dosisKe, tanggal
-// ------------------------------------------------------------
 const vaccinations = [
   {
     id: 1,
@@ -26,49 +12,17 @@ const vaccinations = [
     dosisKe: 2,
     tanggal: "2026-10-03",
   },
-  {
-    id: 2,
-    namaPasien: "Siti Aminah",
-    nik: "1671010202020002",
-    jenisVaksin: "Influenza",
-    dosisKe: 1,
-    tanggal: "2026-10-05",
-  },
-  {
-    id: 3,
-    namaPasien: "Budi Hartono",
-    nik: "1671010303030003",
-    jenisVaksin: "Hepatitis B",
-    dosisKe: 1,
-    tanggal: "2026-10-07",
-  },
-  {
-    id: 4,
-    namaPasien: "Maya Lestari",
-    nik: "1671010404040004",
-    jenisVaksin: "Tetanus",
-    dosisKe: 3,
-    tanggal: "2026-10-09",
-  },
 ];
 
-// id berikutnya (dibuat otomatis oleh server, bertambah terus)
 let nextId = 5;
 
-// ------------------------------------------------------------
-// FUNGSI BANTU
-// ------------------------------------------------------------
-
-// membuat response JSON berformat { status, message, data }
 function kirim(res, kodeStatus, status, message, data) {
   return res.status(kodeStatus).json({ status, message, data });
 }
 
-// validasi field wajib POST/PUT; mengembalikan pesan error, atau null jika valid
 function validasi(body) {
   const { namaPasien, nik, jenisVaksin, dosisKe, tanggal } = body || {};
 
-  // field bertipe string: tidak boleh kosong / hanya spasi
   const fieldString = { namaPasien, nik, jenisVaksin, tanggal };
   for (const [nama, nilai] of Object.entries(fieldString)) {
     if (nilai === undefined || nilai === null || String(nilai).trim() === "") {
@@ -79,7 +33,6 @@ function validasi(body) {
     }
   }
 
-  // dosisKe: wajib diisi, bertipe number, dan lebih dari 0
   if (dosisKe === undefined || dosisKe === null || dosisKe === "") {
     return "Field dosisKe wajib diisi";
   }
@@ -99,13 +52,10 @@ function validasi(body) {
   return null;
 }
 
-// ------------------------------------------------------------
-// ROUTE 0: GET /  -> info API dalam JSON
-// ------------------------------------------------------------
 app.get("/", (req, res) => {
   res.json({
     nama: "Delia Zahrani",
-    nim: "NIM_ANDA",
+    nim: "24288240111",
     kelas: "SI5B",
     topik: 31,
     namaTopik: "Puskesmas - Jadwal Vaksinasi",
@@ -122,51 +72,37 @@ app.get("/", (req, res) => {
   });
 });
 
-// ------------------------------------------------------------
-// ROUTE 1 & 6: GET /vaccinations
-// Ambil semua data, atau filter dengan query string
-// Contoh: GET /vaccinations?jenisVaksin=Hepatitis B
-// ------------------------------------------------------------
-app.get("/vaccinations", (req, res) => {
-  const { jenisVaksin } = req.query; // filter dari query string
 
-  // tanpa filter -> kembalikan semua data (array langsung)
+app.get("/vaccinations", (req, res) => {
+  const { jenisVaksin } = req.query; 
+ 
   if (jenisVaksin === undefined) {
     return res.status(200).json(vaccinations);
   }
 
-  // dengan filter -> array hasil filter (boleh kosong []), tidak membedakan huruf besar/kecil
+  
   const hasil = vaccinations.filter(
     (v) => v.jenisVaksin.toLowerCase() === String(jenisVaksin).trim().toLowerCase()
   );
   res.status(200).json(hasil);
 });
 
-// ------------------------------------------------------------
-// ROUTE 2: GET /vaccinations/:id
-// Ambil satu data berdasarkan id
-// ------------------------------------------------------------
+
 app.get("/vaccinations/:id", (req, res) => {
   const id = parseInt(req.params.id); // id dari route parameter
   const data = vaccinations.find((v) => v.id === id);
 
-  // id tidak ada -> 404
+  
   if (!data) {
     return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
   }
 
-  // berhasil -> objek langsung (tanpa status/message)
+
   res.status(200).json(data);
 });
 
-// ------------------------------------------------------------
-// ROUTE 3: POST /vaccinations
-// Tambah data baru
-// Body: { "namaPasien": "Rudi Santoso", "nik": "1671010101010001",
-//         "jenisVaksin": "Hepatitis B", "dosisKe": 2, "tanggal": "2026-10-03" }
-// ------------------------------------------------------------
+
 app.post("/vaccinations", (req, res) => {
-  // validasi semua field wajib -> gagal: 400
   const pesanError = validasi(req.body);
   if (pesanError) {
     return kirim(res, 400, "error", pesanError, null);
@@ -174,7 +110,7 @@ app.post("/vaccinations", (req, res) => {
 
   const { namaPasien, nik, jenisVaksin, dosisKe, tanggal } = req.body;
 
-  // id dibuat otomatis (nextId), tidak diambil dari body
+  
   const baru = {
     id: nextId++,
     namaPasien: namaPasien.trim(),
@@ -184,27 +120,18 @@ app.post("/vaccinations", (req, res) => {
     tanggal: tanggal.trim(),
   };
   vaccinations.push(baru);
-
-  // berhasil -> 201 + data yang baru dibuat
+  
   kirim(res, 201, "success", "Data berhasil ditambahkan", baru);
 });
 
-// ------------------------------------------------------------
-// ROUTE 4: PUT /vaccinations/:id
-// Ganti SELURUH data (penggantian penuh), semua field wajib dikirim
-// Body: { "namaPasien": "Rudi Santoso", "nik": "1671010101010001",
-//         "jenisVaksin": "Hepatitis B", "dosisKe": 3, "tanggal": "2026-11-03" }
-// ------------------------------------------------------------
 app.put("/vaccinations/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const index = vaccinations.findIndex((v) => v.id === id);
 
-  // id tidak ada -> 404
   if (index === -1) {
     return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
   }
 
-  // field wajib kosong / tidak valid -> 400
   const pesanError = validasi(req.body);
   if (pesanError) {
     return kirim(res, 400, "error", pesanError, null);
@@ -212,7 +139,7 @@ app.put("/vaccinations/:id", (req, res) => {
 
   const { namaPasien, nik, jenisVaksin, dosisKe, tanggal } = req.body;
 
-  // ganti penuh semua field (id tetap)
+  
   vaccinations[index] = {
     id,
     namaPasien: namaPasien.trim(),
@@ -225,15 +152,11 @@ app.put("/vaccinations/:id", (req, res) => {
   kirim(res, 200, "success", "Data berhasil diubah", vaccinations[index]);
 });
 
-// ------------------------------------------------------------
-// ROUTE 5: DELETE /vaccinations/:id
-// Hapus data berdasarkan id
-// ------------------------------------------------------------
 app.delete("/vaccinations/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const index = vaccinations.findIndex((v) => v.id === id);
 
-  // id tidak ada -> 404
+
   if (index === -1) {
     return kirim(res, 404, "error", `Data dengan id ${req.params.id} tidak ditemukan`, null);
   }
@@ -244,16 +167,11 @@ app.delete("/vaccinations/:id", (req, res) => {
   kirim(res, 200, "success", `Data vaksinasi dengan id ${id} berhasil dihapus`, null);
 });
 
-// ------------------------------------------------------------
-// MIDDLEWARE CATCH-ALL 404 (harus setelah semua route)
-// ------------------------------------------------------------
 app.use((req, res) => {
   kirim(res, 404, "error", "Endpoint tidak ditemukan", null);
 });
 
-// ------------------------------------------------------------
-// MIDDLEWARE ERROR (mis. body JSON rusak) -> tetap JSON, bukan HTML
-// ------------------------------------------------------------
+
 app.use((err, req, res, next) => {
   if (err.type === "entity.parse.failed") {
     return kirim(res, 400, "error", "Body request bukan JSON yang valid", null);
@@ -261,10 +179,7 @@ app.use((err, req, res, next) => {
   kirim(res, 500, "error", "Terjadi kesalahan pada server", null);
 });
 
-// ------------------------------------------------------------
-// JALANKAN SERVER
-// app.listen() hanya di lokal; di Vercel app di-export (serverless)
-// ------------------------------------------------------------
+
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => console.log(`Server berjalan di http://localhost:${PORT}`));
