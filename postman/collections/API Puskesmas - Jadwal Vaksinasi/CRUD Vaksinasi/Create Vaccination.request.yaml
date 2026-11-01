@@ -1,0 +1,41 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"namaPasien\": \"Delia zahrani\",\r
+
+    \  \"nik\": \"1671010202020002\",\r
+
+    \  \"jenisVaksin\": \"Influenza\",\r
+
+    \  \"dosisKe\": 1,\r
+
+    \  \"tanggal\": \"2026-11-10\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 201\", function () {\r
+
+      \    pm.response.to.have.status(201);\r
+
+      });\r
+
+      pm.test(\"Response memuat data vaksinasi baru dengan id\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.eql(\"success\");\r
+
+      \    pm.expect(body.data).to.have.property(\"id\");\r
+
+      \    pm.expect(body.data.namaPasien).to.eql(\"Siti Aminah\");\r
+
+      \    pm.environment.set(\"vaccinationId\", body.data.id);\r
+
+      });"
+    language: text/javascript
+order: 4000

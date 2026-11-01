@@ -1,0 +1,30 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations?jenisVaksin=Hepatitis B
+method: GET
+queryParams:
+  jenisVaksin: Hepatitis B
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Semua hasil filter berjenis vaksin Hepatitis B\", function () {\r
+
+      \    const data = pm.response.json();\r
+
+      \    pm.expect(data).to.be.an(\"array\");\r
+
+      \    pm.expect(data.length).to.be.above(0);\r
+
+      \    data.forEach(function (v) {\r
+
+      \        pm.expect(v.jenisVaksin).to.eql(\"Hepatitis B\");\r
+
+      \    });\r
+
+      });"
+    language: text/javascript
+order: 3000

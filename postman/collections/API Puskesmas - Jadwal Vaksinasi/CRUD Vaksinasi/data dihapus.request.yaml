@@ -1,0 +1,24 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations/5
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Status success, pesan berhasil dihapus, data null\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.eql(\"success\");\r
+
+      \    pm.expect(body.message).to.include(\"berhasil dihapus\");\r
+
+      \    pm.expect(body.data).to.be.null;\r
+
+      });"
+    language: text/javascript
+order: 7000

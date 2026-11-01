@@ -1,0 +1,24 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations/5
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });\r
+
+      pm.test(\"Status error, pesan tidak ditemukan, data null\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.eql(\"error\");\r
+
+      \    pm.expect(body.message).to.include(\"tidak ditemukan\");\r
+
+      \    pm.expect(body.data).to.be.null;\r
+
+      });"
+    language: text/javascript
+order: 1000

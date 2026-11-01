@@ -1,0 +1,22 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations/9999
+method: PUT
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });\r
+
+      pm.test(\"Pesan error: Data dengan id 999999 tidak ditemukan\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.eql(\"error\");\r
+
+      \    pm.expect(body.message).to.eql(\"Data dengan id 999999 tidak ditemukan\");\r
+
+      });"
+    language: text/javascript
+order: 3000

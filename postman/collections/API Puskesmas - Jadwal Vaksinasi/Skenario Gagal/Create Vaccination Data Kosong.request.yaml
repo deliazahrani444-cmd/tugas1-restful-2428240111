@@ -1,0 +1,22 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations
+method: POST
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 400\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r
+
+      pm.test(\"Pesan error: Field namaPasien wajib diisi\", function () {\r
+
+      \    const body = pm.response.json();\r
+
+      \    pm.expect(body.status).to.eql(\"error\");\r
+
+      \    pm.expect(body.message).to.eql(\"Field namaPasien wajib diisi\");\r
+
+      });"
+    language: text/javascript
+order: 2000

@@ -1,0 +1,22 @@
+$kind: http-request
+url: http://localhost:3000
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Response memuat identitas dan resource /vaccinations\", function () {\r
+
+      \    const data = pm.response.json();\r
+
+      \    pm.expect(data).to.include.all.keys(\"nama\", \"nim\", \"kelas\", \"resource\", \"endpoint\");\r
+
+      \    pm.expect(data.resource).to.eql(\"/vaccinations\");\r
+
+      });"
+    language: text/javascript
+order: 1000

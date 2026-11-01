@@ -1,0 +1,24 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"Response berupa array vaksinasi dengan field lengkap\", function () {\r
+
+      \    const data = pm.response.json();\r
+
+      \    pm.expect(data).to.be.an(\"array\");\r
+
+      \    pm.expect(data.length).to.be.above(0);\r
+
+      \    pm.expect(data[0]).to.include.all.keys(\"id\", \"namaPasien\", \"nik\", \"jenisVaksin\", \"dosisKe\", \"tanggal\");\r
+
+      });"
+    language: text/javascript
+order: 2000

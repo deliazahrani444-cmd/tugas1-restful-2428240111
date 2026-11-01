@@ -1,0 +1,6 @@
+name: Vaccination Local
+values:
+  - key: base_url
+    value: ''
+  - key: vaccinationId
+    value: ''

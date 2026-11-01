@@ -1,0 +1,22 @@
+$kind: http-request
+url: http://localhost:3000/vaccinations/5
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Status code adalah 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      pm.test(\"ID dan nama pasien sesuai data yang dibuat\", function () {\r
+
+      \    const data = pm.response.json();\r
+
+      \    pm.expect(data.id).to.eql(Number(pm.environment.get(\"vaccinationId\")));\r
+
+      \    pm.expect(data.namaPasien).to.eql(\"Siti Aminah\");\r
+
+      });"
+    language: text/javascript
+order: 5000
